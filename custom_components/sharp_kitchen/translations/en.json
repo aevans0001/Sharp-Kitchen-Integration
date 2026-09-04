@@ -1,0 +1,53 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Sharp Kitchen",
+        "description": "Enter the email and password for your Sharp Kitchen (na-kitchen) account -- the same one used in the Sharp Kitchen phone app.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Login failed. Check your email and password. If they're correct, Sharp's login may require a login method this integration doesn't support yet (see the README).",
+      "cannot_connect": "Logged in, but could not reach the Sharp Kitchen device service to verify your account. Please try again."
+    },
+    "abort": {
+      "already_configured": "This Sharp Kitchen account is already set up."
+    }
+  },
+  "services": {
+    "start_cook": {
+      "name": "Start Cook",
+      "description": "Start a manual cook on a Sharp Kitchen device.",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The numeric device ID from Sharp's backend."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "Cook mode name (\"microwave\" is confirmed working)."
+        },
+        "cook_time": {
+          "name": "Cook Time",
+          "description": "Cook duration as H:MM:SS."
+        },
+        "power": {
+          "name": "Power Level",
+          "description": "Microwave power level."
+        },
+        "temperature": {
+          "name": "Temperature",
+          "description": "Target temperature for modes that use one."
+        },
+        "with_preheat": {
+          "name": "With Preheat",
+          "description": "Whether to preheat before cooking."
+        }
+      }
+    }
+  }
+}

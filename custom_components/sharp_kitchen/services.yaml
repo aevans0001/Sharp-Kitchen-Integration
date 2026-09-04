@@ -1,0 +1,108 @@
+start_cook:
+  name: Start Cook
+  description: >-
+    Start a manual cook on a Sharp Kitchen device. Only mode "microwave"
+    with a power level has been tested; other modes/temperature are
+    supported by the underlying API call but unverified.
+  fields:
+    device_id:
+      name: Device ID
+      description: >-
+        The numeric device ID from Sharp's backend. This is the number in
+        each device's Home Assistant entity unique IDs (e.g. the "13255" in
+        "sharp_kitchen_13255_cook"), not anything printed on the appliance.
+      required: true
+      example: 13255
+      selector:
+        number:
+          min: 1
+          mode: box
+    mode:
+      name: Mode
+      description: >-
+        Cook mode name. "microwave" is confirmed working. Other values
+        (e.g. convection/grill modes on other Sharp appliances) are passed
+        through as-is and unverified.
+      required: false
+      default: microwave
+      selector:
+        text:
+    cook_time:
+      name: Cook Time
+      description: 'Cook duration as H:MM:SS, e.g. "0:01:30" for 90 seconds.'
+      required: false
+      default: "0:01:00"
+      selector:
+        text:
+    power:
+      name: Power Level
+      description: >-
+        Microwave power level, 1-100. The real app's own screen shows this
+        as a 0%-100% slider, so this range matches that -- but the exact
+        number sent over the wire when the app's slider is at, say, 100%
+        hasn't been independently confirmed by a network capture yet.
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 100
+          mode: box
+    temperature:
+      name: Temperature
+      description: >-
+        Target temperature for modes that use one (e.g. oven/convection).
+        Wired through to the API but never exercised in testing.
+      required: false
+      selector:
+        number:
+          min: 100
+          max: 500
+          mode: box
+    with_preheat:
+      name: With Preheat
+      description: Whether to preheat before cooking. Unverified.
+      required: false
+      default: false
+      selector:
+        boolean:
+
+start_smart_cook:
+  name: Start Smart Cook
+  description: >-
+    Start one of Sharp's built-in "Smart Cook" presets (the
+    Beverage/Defrost/Fish/Frozen Entree/Ground Meat/Melt/Popcorn/
+    Potatoes/Reheat/Rice/Soft-Warm/Vegetables grid in the real app).
+    Only 3 of Sharp's ~30 presets have been captured and confirmed so
+    far -- see the integration's README/api.py for the current list.
+    Using any other auto_number is untested but likely to work the same
+    way, since they all go through this same command.
+  fields:
+    device_id:
+      name: Device ID
+      description: The numeric device ID from Sharp's backend.
+      required: true
+      example: 13255
+      selector:
+        number:
+          min: 1
+          mode: box
+    auto_number:
+      name: Preset Code
+      description: >-
+        Which Smart Cook preset to run. Confirmed working values:
+        "D7001" (weight 1.2), "M8007" (weight 0.5), "M8008" (weight 1) --
+        exact preset names for these not yet confirmed.
+      required: true
+      example: D7001
+      selector:
+        text:
+    auto_weight:
+      name: Weight / Quantity
+      description: >-
+        The weight or quantity for the chosen preset, as the app's own
+        slider for that preset would send it (units vary by preset --
+        pounds, cups, servings, etc., not yet mapped per preset).
+      required: true
+      example: "1.2"
+      selector:
+        text:

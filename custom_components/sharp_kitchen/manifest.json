@@ -1,0 +1,12 @@
+{
+  "domain": "sharp_kitchen",
+  "name": "Sharp Kitchen",
+  "codeowners": ["@aevans0001"],
+  "config_flow": true,
+  "documentation": "https://github.com/aevans0001/Sharp-Kitchen-Integration",
+  "issue_tracker": "https://github.com/aevans0001/Sharp-Kitchen-Integration/issues",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "requirements": ["cryptography"],
+  "version": "0.8.2"
+}
