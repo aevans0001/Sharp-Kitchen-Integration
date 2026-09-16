@@ -85,7 +85,7 @@ class SharpKitchenSensor(CoordinatorEntity[SharpKitchenCoordinator], SensorEntit
         d = self._device
         return DeviceInfo(
             identifiers={(DOMAIN, str(self._device_id))},
-            name=d.get("name", f"Sharp device {self._device_id}"),
+            name=f"Microwave - Sharp {d.get('model_name') or 'SMD2489ES'}",
             manufacturer="Sharp",
             model=d.get("model_name"),
             connections=(

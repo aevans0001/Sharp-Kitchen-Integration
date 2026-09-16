@@ -49,6 +49,7 @@ import json
 import logging
 import os
 import ssl
+import asyncio
 import tempfile
 import time
 import urllib.parse
@@ -116,7 +117,7 @@ def get_cognito_username(access_token: str) -> str:
 _client_ssl_context: ssl.SSLContext | None = None
 
 
-def _get_client_ssl_context() -> ssl.SSLContext:
+def _build_client_ssl_context() -> ssl.SSLContext:
     """Build (once, then cache) the SSLContext used for mutual TLS to
     Sharp's device API. See the module docstring and the CLIENT_CERT_B64
     comment in const.py for why this is required at all.
@@ -167,6 +168,14 @@ def _get_client_ssl_context() -> ssl.SSLContext:
 
     _client_ssl_context = ctx
     return ctx
+
+
+async def _get_client_ssl_context() -> ssl.SSLContext:
+    """Return the cached mTLS context without blocking HA's event loop."""
+    global _client_ssl_context
+    if _client_ssl_context is None:
+        _client_ssl_context = await asyncio.to_thread(_build_client_ssl_context)
+    return _client_ssl_context
 
 
 class SharpKitchenError(Exception):
@@ -405,7 +414,7 @@ class SharpKitchenClient:
             API_BASE + INITIALIZE_PATH,
             json=payload,
             headers=headers,
-            ssl=_get_client_ssl_context(),
+            ssl=await _get_client_ssl_context(),
         ) as resp:
             try:
                 body = await resp.json(content_type=None)
@@ -440,7 +449,7 @@ class SharpKitchenClient:
             params=params,
             json=json_body,
             headers=headers,
-            ssl=_get_client_ssl_context(),
+            ssl=await _get_client_ssl_context(),
         ) as resp:
             try:
                 body = await resp.json(content_type=None)
@@ -559,11 +568,9 @@ class SharpKitchenClient:
 
         `auto_number` identifies which preset (e.g. "D7001") and
         `auto_weight` is the weight/quantity for it (e.g. "1.2") -- both
-        exactly as captured from the real app's traffic. Only 3 of Sharp's
-        ~30-ish presets have been captured and confirmed so far; this
-        method itself works for any of them, but this integration doesn't
-        yet know the full catalog of codes/human names/units. See
-        SMART_COOK_PRESETS in const.py for the ones that are confirmed.
+        exactly as captured from the real app's traffic. All 29 SMD2489ES
+        Microwave Drawer presets are cataloged in SMART_COOK_PRESETS
+        (const.py); use the Smart Cook entities for normal use.
         """
         await self._request(
             "POST",

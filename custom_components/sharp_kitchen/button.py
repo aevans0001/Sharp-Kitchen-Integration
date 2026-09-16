@@ -14,10 +14,11 @@ from __future__ import annotations
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, SMART_COOK_PRESETS
+from .const import DOMAIN
 from .coordinator import SharpKitchenCoordinator
 from .number import DEFAULT_COOK_SECONDS, DEFAULT_POWER
 
@@ -55,7 +56,7 @@ async def async_setup_entry(
 
 class SharpKitchenStartButton(ButtonEntity):
     _attr_has_entity_name = True
-    _attr_name = "Start Cook"
+    _attr_name = "Manual Cook - ⏵︎ Start"
     _attr_icon = "mdi:microwave"
 
     def __init__(self, coordinator: SharpKitchenCoordinator, device_id: int) -> None:
@@ -82,7 +83,7 @@ class SharpKitchenStartButton(ButtonEntity):
         d = self._coordinator.data.get(self._device_id, {})
         return DeviceInfo(
             identifiers={(DOMAIN, str(self._device_id))},
-            name=d.get("name", f"Sharp device {self._device_id}"),
+            name=f"Microwave - Sharp {d.get('model_name') or 'SMD2489ES'}",
             manufacturer="Sharp",
             model=d.get("model_name"),
         )
@@ -90,7 +91,7 @@ class SharpKitchenStartButton(ButtonEntity):
 
 class SharpKitchenStopButton(ButtonEntity):
     _attr_has_entity_name = True
-    _attr_name = "Stop Cook"
+    _attr_name = "Manual Cook - ■ Stop"
 
     def __init__(self, coordinator: SharpKitchenCoordinator, device_id: int) -> None:
         self._coordinator = coordinator
@@ -107,7 +108,7 @@ class SharpKitchenStopButton(ButtonEntity):
         d = self._coordinator.data.get(self._device_id, {})
         return DeviceInfo(
             identifiers={(DOMAIN, str(self._device_id))},
-            name=d.get("name", f"Sharp device {self._device_id}"),
+            name=f"Microwave - Sharp {d.get('model_name') or 'SMD2489ES'}",
             manufacturer="Sharp",
             model=d.get("model_name"),
         )
@@ -115,7 +116,7 @@ class SharpKitchenStopButton(ButtonEntity):
 
 class SharpKitchenPauseButton(ButtonEntity):
     _attr_has_entity_name = True
-    _attr_name = "Pause Cook"
+    _attr_name = "Manual Cook - ⏸︎ Pause"
     _attr_icon = "mdi:pause"
 
     def __init__(self, coordinator: SharpKitchenCoordinator, device_id: int) -> None:
@@ -133,7 +134,7 @@ class SharpKitchenPauseButton(ButtonEntity):
         d = self._coordinator.data.get(self._device_id, {})
         return DeviceInfo(
             identifiers={(DOMAIN, str(self._device_id))},
-            name=d.get("name", f"Sharp device {self._device_id}"),
+            name=f"Microwave - Sharp {d.get('model_name') or 'SMD2489ES'}",
             manufacturer="Sharp",
             model=d.get("model_name"),
         )
@@ -141,7 +142,7 @@ class SharpKitchenPauseButton(ButtonEntity):
 
 class SharpKitchenOpenDoorButton(ButtonEntity):
     _attr_has_entity_name = True
-    _attr_name = "Open Drawer"
+    _attr_name = "Drawer - Open"
     _attr_icon = "mdi:door-open"
 
     def __init__(self, coordinator: SharpKitchenCoordinator, device_id: int) -> None:
@@ -159,7 +160,7 @@ class SharpKitchenOpenDoorButton(ButtonEntity):
         d = self._coordinator.data.get(self._device_id, {})
         return DeviceInfo(
             identifiers={(DOMAIN, str(self._device_id))},
-            name=d.get("name", f"Sharp device {self._device_id}"),
+            name=f"Microwave - Sharp {d.get('model_name') or 'SMD2489ES'}",
             manufacturer="Sharp",
             model=d.get("model_name"),
         )
@@ -170,7 +171,7 @@ class SharpKitchenStartSmartCookButton(ButtonEntity):
     Preset" select entity and "Smart Cook Weight" number entity."""
 
     _attr_has_entity_name = True
-    _attr_name = "Start Smart Cook"
+    _attr_name = "Smart Cook - ⏵︎ Start"
     _attr_icon = "mdi:chef-hat"
 
     def __init__(self, coordinator: SharpKitchenCoordinator, device_id: int) -> None:
@@ -181,12 +182,12 @@ class SharpKitchenStartSmartCookButton(ButtonEntity):
 
     async def async_press(self) -> None:
         auto_number = self._coordinator.smart_cook_preset(self._device_id)
-        preset = SMART_COOK_PRESETS[auto_number]
-        weight = self._coordinator.pending_smart_cook_weight.get(
-            self._device_id, preset["default_weight"]
-        )
+        try:
+            value = self._coordinator.smart_cook_value(self._device_id)
+        except ValueError as err:
+            raise HomeAssistantError(f"Invalid Smart Cook selection: {err}") from err
         await self._coordinator.client.async_start_smart_cook(
-            self._device_id, auto_number, weight
+            self._device_id, auto_number, value
         )
         await self._coordinator.async_request_refresh()
 
@@ -195,7 +196,7 @@ class SharpKitchenStartSmartCookButton(ButtonEntity):
         d = self._coordinator.data.get(self._device_id, {})
         return DeviceInfo(
             identifiers={(DOMAIN, str(self._device_id))},
-            name=d.get("name", f"Sharp device {self._device_id}"),
+            name=f"Microwave - Sharp {d.get('model_name') or 'SMD2489ES'}",
             manufacturer="Sharp",
             model=d.get("model_name"),
         )

@@ -69,13 +69,9 @@ start_cook:
 start_smart_cook:
   name: Start Smart Cook
   description: >-
-    Start one of Sharp's built-in "Smart Cook" presets (the
-    Beverage/Defrost/Fish/Frozen Entree/Ground Meat/Melt/Popcorn/
-    Potatoes/Reheat/Rice/Soft-Warm/Vegetables grid in the real app).
-    Only 3 of Sharp's ~30 presets have been captured and confirmed so
-    far -- see the integration's README/api.py for the current list.
-    Using any other auto_number is untested but likely to work the same
-    way, since they all go through this same command.
+    Low-level Smart Cook command. The normal device UI validates the official
+    SMD2489ES preset catalog and should be preferred. This raw service remains
+    for backward compatibility and accepts the exact app protocol fields.
   fields:
     device_id:
       name: Device ID
@@ -89,19 +85,18 @@ start_smart_cook:
     auto_number:
       name: Preset Code
       description: >-
-        Which Smart Cook preset to run. Confirmed working values:
-        "D7001" (weight 1.2), "M8007" (weight 0.5), "M8008" (weight 1) --
-        exact preset names for these not yet confirmed.
+        Raw Smart Cook menu ID from the official app catalog, for example
+        D7001, M8007, P3001_1, R3006, or S3011. This raw service does not
+        replace the catalog-validating device UI.
       required: true
       example: D7001
       selector:
         text:
     auto_weight:
-      name: Weight / Quantity
+      name: App Parameter Value
       description: >-
-        The weight or quantity for the chosen preset, as the app's own
-        slider for that preset would send it (units vary by preset --
-        pounds, cups, servings, etc., not yet mapped per preset).
+        Exact string value sent by the app for the selected preset. Numeric
+        and option presets have catalog-defined values; sensor programs use 0.
       required: true
       example: "1.2"
       selector:

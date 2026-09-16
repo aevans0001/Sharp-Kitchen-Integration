@@ -165,37 +165,243 @@ DOOR_STATE_OPEN = "open"  # not directly observed, but the natural counterpart
 # Confirmed working for all three; others may exist per-model.
 SETTING_KEYS = ["forget_take", "short_tone", "easy_wave"]
 
-# --- Smart Cook presets ({"command":"cook_smart","auto_number":...,
-# "auto_weight":...}) ---
-#
-# Sharp's real app has ~30 of these across 12 categories (Beverage/Hot
-# Cereal, Defrost, Fish/Seafood, Frozen Entree, Ground Meat, Melt,
-# Popcorn, Potatoes, Reheat, Rice, Soft/Warm, Vegetables). Only these 3
-# have actually been captured and named so far (confirmed directly by
-# the user, matching what they selected in the real app when this was
-# captured) -- the rest of the catalog is unknown until more are
-# captured the same way. min/max/unit below come from the real app's own
-# screen for each of these three (e.g. "0.5 LB TO 2.0 LBS").
-SMART_COOK_PRESETS = {
-    "D7001": {
-        "name": "Defrost Ground Meat",
-        "unit": "lb",
-        "min_weight": 0.5,
-        "max_weight": 2.0,
-        "default_weight": 1.2,
+# --- Smart Cook presets (official SMD2489ES Microwave Drawer catalog) ---
+# Generated from research/SMD2489ES_SMART_COOK_MAP.json. The data originates
+# from the Sharp Android app bundled catalog; C-prefixed Convection Drawer
+# entries are intentionally excluded.
+SMART_COOK_PRESETS: dict[str, dict[str, object]] = {
+    'M8007': {
+        'name': 'Beverage Reheat',
+        'category': 'BEVERAGE / HOT CEREAL',
+        'parameter_type': 'numeric',
+        'default_value': 1,
+        'min_value': 0.5,
+        'max_value': 2,
+        'step': 0.5,
+        'unit': 'cup',
     },
-    "M8007": {
-        "name": "Beverage Reheat",
-        "unit": "cup",
-        "min_weight": 0.5,
-        "max_weight": 2.0,
-        "default_weight": 0.5,
+    'M8008': {
+        'name': 'Hot Water',
+        'category': 'BEVERAGE / HOT CEREAL',
+        'parameter_type': 'numeric',
+        'default_value': 3,
+        'min_value': 1,
+        'max_value': 6,
+        'step': 1,
+        'unit': 'cup',
     },
-    "M8008": {
-        "name": "Hot Water",
-        "unit": "cup",
-        "min_weight": 1.0,
-        "max_weight": 6.0,
-        "default_weight": 1.0,
+    'M8009': {
+        'name': 'Hot Cereal',
+        'category': 'BEVERAGE / HOT CEREAL',
+        'parameter_type': 'numeric',
+        'default_value': 3,
+        'min_value': 1,
+        'max_value': 6,
+        'step': 1,
+        'unit': 'servings',
+    },
+    'D7001': {
+        'name': 'Defrost Ground Meat',
+        'category': 'DEFROST',
+        'parameter_type': 'numeric',
+        'default_value': 1.2,
+        'min_value': 0.5,
+        'max_value': 2,
+        'step': 0.1,
+        'unit': 'lb',
+    },
+    'D7002': {
+        'name': 'Defrost Steaks / Chops',
+        'category': 'DEFROST',
+        'parameter_type': 'numeric',
+        'default_value': 1.8,
+        'min_value': 0.5,
+        'max_value': 3,
+        'step': 0.1,
+        'unit': 'lb',
+    },
+    'D7003': {
+        'name': 'Defrost Boneless Poultry',
+        'category': 'DEFROST',
+        'parameter_type': 'numeric',
+        'default_value': 1.2,
+        'min_value': 0.5,
+        'max_value': 2,
+        'step': 0.1,
+        'unit': 'lb',
+    },
+    'D7004': {
+        'name': 'Defrost Bone-in Poultry',
+        'category': 'DEFROST',
+        'parameter_type': 'numeric',
+        'default_value': 1.8,
+        'min_value': 0.5,
+        'max_value': 3,
+        'step': 0.1,
+        'unit': 'lb',
+    },
+    'D7005': {
+        'name': 'Defrost Roast',
+        'category': 'DEFROST',
+        'parameter_type': 'numeric',
+        'default_value': 3,
+        'min_value': 2,
+        'max_value': 4,
+        'step': 0.1,
+        'unit': 'lb',
+    },
+    'D7006': {
+        'name': 'Defrost Casserole / Soup',
+        'category': 'DEFROST',
+        'parameter_type': 'numeric',
+        'default_value': 3,
+        'min_value': 1,
+        'max_value': 6,
+        'step': 1,
+        'unit': 'cup',
+    },
+    'S3013': {
+        'name': 'Fish / Seafood',
+        'category': 'FISH / SEAFOOD',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3021': {
+        'name': 'Frozen Entrée',
+        'category': 'FROZEN ENTRÉE',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3020': {
+        'name': 'Ground Meat',
+        'category': 'GROUND MEAT',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'M8001': {
+        'name': 'Melt Butter',
+        'category': 'MELT',
+        'parameter_type': 'option',
+        'default_value': '1',
+        'options': {
+            '1': '2 TBSP',
+            '2': '8 TBSP',
+        },
+    },
+    'M8002': {
+        'name': 'Melt Chocolate',
+        'category': 'MELT',
+        'parameter_type': 'option',
+        'default_value': '1',
+        'options': {
+            '1': '1 CUP CHIPS',
+            '2': '1 SQUARE',
+        },
+    },
+    'P3001_1': {
+        'name': 'Regular Popcorn',
+        'category': 'POPCORN',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'P3001_2': {
+        'name': 'Mini Popcorn',
+        'category': 'POPCORN',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3011': {
+        'name': 'Baked Potatoes',
+        'category': 'POTATOES',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3012': {
+        'name': 'Sweet Potatoes',
+        'category': 'POTATOES',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'R3006': {
+        'name': 'Reheat',
+        'category': 'REHEAT',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3014': {
+        'name': 'Brown Rice',
+        'category': 'RICE',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3015': {
+        'name': 'White Rice',
+        'category': 'RICE',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'M8003': {
+        'name': 'Soften Ice Cream',
+        'category': 'SOFT / WARM',
+        'parameter_type': 'option',
+        'default_value': '1',
+        'options': {
+            '1': '1 PINT',
+            '2': '1.5 QUARTS',
+        },
+    },
+    'M8004': {
+        'name': 'Soften Cream Cheese',
+        'category': 'SOFT / WARM',
+        'parameter_type': 'option',
+        'default_value': '1',
+        'options': {
+            '1': '3 OZ',
+            '2': '8 OZ',
+        },
+    },
+    'M8005': {
+        'name': 'Warm Syrup',
+        'category': 'SOFT / WARM',
+        'parameter_type': 'option',
+        'default_value': '1',
+        'options': {
+            '1': '0.25 CUP',
+            '2': '0.5 CUP',
+        },
+    },
+    'M8006': {
+        'name': 'Warm Dessert Toppings',
+        'category': 'SOFT / WARM',
+        'parameter_type': 'option',
+        'default_value': '1',
+        'options': {
+            '1': '0.25 CUP',
+            '2': '0.5 CUP',
+        },
+    },
+    'S3016': {
+        'name': 'Quick Fresh Vegetables',
+        'category': 'VEGETABLES',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3017': {
+        'name': 'Longer Fresh Vegetables',
+        'category': 'VEGETABLES',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3018': {
+        'name': 'Steamer Bag',
+        'category': 'VEGETABLES',
+        'parameter_type': 'sensor',
+        'default_value': '0',
+    },
+    'S3019': {
+        'name': 'Frozen Vegetables',
+        'category': 'VEGETABLES',
+        'parameter_type': 'sensor',
+        'default_value': '0',
     },
 }
