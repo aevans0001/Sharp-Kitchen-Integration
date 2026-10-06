@@ -19,6 +19,7 @@
   and temperature.
 - UI-based Home Assistant configuration.
 - HACS repository metadata and validation workflows.
+- Temporary Sharp Kitchen brand icon added for HACS/Home Assistant presentation.
 - Integration-wide actions registered once at Home Assistant integration
   setup rather than once per config entry.
 - English translations include both low-level cook actions.
