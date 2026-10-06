@@ -90,3 +90,13 @@ def test_release_blocker_is_documented() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "Formal HACS release is currently **blocked**" in readme
     assert "There is no published `0.9.0` release yet" in readme
+
+
+def test_brand_icon_is_256_square_png() -> None:
+    icon = INTEGRATION / "brand" / "icon.png"
+    data = icon.read_bytes()
+    assert data[:8] == b"\x89PNG\r\n\x1a\n"
+    assert data[12:16] == b"IHDR"
+    width = int.from_bytes(data[16:20], "big")
+    height = int.from_bytes(data[20:24], "big")
+    assert (width, height) == (256, 256)
