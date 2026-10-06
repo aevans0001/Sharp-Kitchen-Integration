@@ -46,6 +46,7 @@ until that blocker is resolved and release validation is repeated.
 - Offline release-readiness tests pass.
 - Home Assistant hassfest passes.
 - HACS validation currently passes 7 of 9 repository checks. The MIT license and brand-neutral icon pass; only the GitHub repository description and topics remain as non-authentication HACS metadata items.
+- Authentication research now documents Sharp's newer SHARP HOME ecosystem for later appliance revisions, but no public provisioning/API path has yet been found that resolves the existing Sharp Kitchen mTLS blocker.
 - Draft PR #1 remains unmerged.
 - No `0.9.0` tag or GitHub release exists.
 
