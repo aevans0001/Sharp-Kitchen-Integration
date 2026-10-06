@@ -119,6 +119,34 @@ Public GitHub/code searches for the Sharp Kitchen backend host, API path,
 application package, and bundled PKCS#12 filename did not uncover an independent
 implementation or a documented certificate-registration endpoint.
 
+## 2026 SHARP HOME migration findings
+
+Sharp introduced a newer **SHARP HOME** app in 2025. Current 2026 Sharp pairing
+documentation distinguishes appliance revisions by model suffix rather than
+migrating every existing SMD2489ES automatically:
+
+- `SMD2489ESF` uses the SHARP HOME app.
+- `SMD2489ESA/B/D/E` use the older Sharp Kitchen app.
+
+The SHARP HOME Android package is `jp.co.sharp.chglobal.na`. Sharp's current
+documentation also shows **SHARP HOME - Kitchen** account linking through Google
+Home and Alexa using a Sharp account, with Google Home relinking required every
+180 days.
+
+This is important because it demonstrates a newer Sharp cloud/account-linking
+stack that supports third-party smart-home ecosystems. However, the public
+documentation does **not** expose:
+
+- a third-party developer API for direct appliance control;
+- a way for Home Assistant users to register their own OAuth application;
+- a method to issue a Home Assistant-specific client TLS certificate/key;
+- evidence that older Sharp Kitchen SMD2489ES revisions can migrate to the
+  SHARP HOME backend.
+
+Therefore the newer SHARP HOME ecosystem is worth separate future protocol
+research, especially for `SMD2489ESF` and later models, but it does not yet
+remove the credential blocker for the existing Sharp Kitchen implementation.
+
 ### Best viable public-safe fallback at this checkpoint
 
 If no Sharp provisioning endpoint is discovered, the most practical direct
