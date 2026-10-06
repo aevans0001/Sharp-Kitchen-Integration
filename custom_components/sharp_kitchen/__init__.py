@@ -26,6 +26,8 @@ from .coordinator import SharpKitchenCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 PLATFORMS = ["sensor", "switch", "button", "number", "select"]
 
 SERVICE_START_COOK = "start_cook"
