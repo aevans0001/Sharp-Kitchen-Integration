@@ -102,6 +102,44 @@ itself, make the current Sharp login flow a standard Home Assistant OAuth flow.
 A separate compatibility investigation is required before refactoring login to
 Home Assistant's OAuth helpers.
 
+## Additional provisioning research
+
+Public Sharp material reviewed during release preparation continues to direct
+SMD2489ES users through the Sharp Kitchen app for appliance pairing. The
+published pairing flow covers Wi-Fi/app/account pairing but does not document
+issuance of a new client TLS certificate or private key to third-party clients.
+
+Sharp also publishes an Alexa account-linking path using the user's Sharp
+account. This proves that Sharp supports account linking outside the mobile app,
+but it does not expose a public device-control API, a user-created OAuth client,
+or a per-installation mTLS credential flow that Home Assistant could currently
+reuse.
+
+Public GitHub/code searches for the Sharp Kitchen backend host, API path,
+application package, and bundled PKCS#12 filename did not uncover an independent
+implementation or a documented certificate-registration endpoint.
+
+### Best viable public-safe fallback at this checkpoint
+
+If no Sharp provisioning endpoint is discovered, the most practical direct
+client design is:
+
+1. Remove vendor-app secrets/key material from the future public release only
+   after a tested replacement exists.
+2. Let the user supply OAuth application values locally.
+3. Store/select the OAuth client ID and client secret through Home Assistant
+   Application Credentials where compatible with Sharp's hosted-login behavior.
+4. Let the user supply the mTLS certificate and private key as local files,
+   preferably under `/config/sharp_kitchen/`.
+5. Store only file paths/references in the config entry, not private-key text.
+6. Validate certificate/key parsing and matching during setup/reconfigure.
+7. Keep extraction/import outside the HACS package, ideally through a separate
+   local helper if a repeatable extraction method can be made practical.
+
+This is not as user-friendly as true vendor provisioning, but it keeps the HACS
+repository free of the extracted private key and avoids a project-operated
+cloud relay.
+
 ## Current recommendation
 
 Do not change the working integration yet.
