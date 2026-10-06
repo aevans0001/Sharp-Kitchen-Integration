@@ -16,6 +16,7 @@ import logging
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -50,6 +51,60 @@ START_SMART_COOK_SCHEMA = vol.Schema(
 )
 
 
+def _coordinator_for_device(
+    hass: HomeAssistant, device_id: int
+) -> SharpKitchenCoordinator:
+    """Return the loaded coordinator that owns a Sharp backend device ID."""
+    matches = [
+        coordinator
+        for coordinator in hass.data.get(DOMAIN, {}).values()
+        if device_id in coordinator.devices
+    ]
+    if not matches:
+        raise HomeAssistantError(f"Sharp Kitchen device ID {device_id} is not loaded")
+    if len(matches) > 1:
+        raise HomeAssistantError(
+            f"Sharp Kitchen device ID {device_id} is ambiguous across configured accounts"
+        )
+    return matches[0]
+
+
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Register integration-wide actions once, independent of config entries."""
+
+    async def _handle_start_cook(call: ServiceCall) -> None:
+        coordinator = _coordinator_for_device(hass, call.data["device_id"])
+        await coordinator.client.async_start_cook(
+            call.data["device_id"],
+            mode=call.data["mode"],
+            cook_time=call.data["cook_time"],
+            power=call.data.get("power"),
+            temperature=call.data.get("temperature"),
+            with_preheat=call.data["with_preheat"],
+        )
+        await coordinator.async_request_refresh()
+
+    async def _handle_start_smart_cook(call: ServiceCall) -> None:
+        coordinator = _coordinator_for_device(hass, call.data["device_id"])
+        await coordinator.client.async_start_smart_cook(
+            call.data["device_id"],
+            call.data["auto_number"],
+            call.data["auto_weight"],
+        )
+        await coordinator.async_request_refresh()
+
+    hass.services.async_register(
+        DOMAIN, SERVICE_START_COOK, _handle_start_cook, schema=START_COOK_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_START_SMART_COOK,
+        _handle_start_smart_cook,
+        schema=START_SMART_COOK_SCHEMA,
+    )
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     session = async_get_clientsession(hass)
     client = SharpKitchenClient(
@@ -66,37 +121,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-
-    async def _handle_start_cook(call: ServiceCall) -> None:
-        await client.async_start_cook(
-            call.data["device_id"],
-            mode=call.data["mode"],
-            cook_time=call.data["cook_time"],
-            power=call.data.get("power"),
-            temperature=call.data.get("temperature"),
-            with_preheat=call.data["with_preheat"],
-        )
-        await coordinator.async_request_refresh()
-
-    hass.services.async_register(
-        DOMAIN, SERVICE_START_COOK, _handle_start_cook, schema=START_COOK_SCHEMA
-    )
-
-    async def _handle_start_smart_cook(call: ServiceCall) -> None:
-        await client.async_start_smart_cook(
-            call.data["device_id"],
-            call.data["auto_number"],
-            call.data["auto_weight"],
-        )
-        await coordinator.async_request_refresh()
-
-    hass.services.async_register(
-        DOMAIN,
-        SERVICE_START_SMART_COOK,
-        _handle_start_smart_cook,
-        schema=START_SMART_COOK_SCHEMA,
-    )
-
     return True
 
 
