@@ -19,7 +19,7 @@
   and temperature.
 - UI-based Home Assistant configuration.
 - HACS repository metadata and validation workflows.
-- Temporary Sharp Kitchen brand icon added for HACS/Home Assistant presentation.
+- Original brand-neutral microwave-drawer icon added for HACS/Home Assistant presentation.
 - Integration-wide actions registered once at Home Assistant integration
   setup rather than once per config entry.
 - English translations include both low-level cook actions.
@@ -45,7 +45,7 @@ until that blocker is resolved and release validation is repeated.
 - MIT License selected.
 - Offline release-readiness tests pass.
 - Home Assistant hassfest passes.
-- HACS validation currently passes 7 of 9 repository checks. The MIT license and brand icon now pass; only the GitHub repository description and topics remain as non-authentication HACS metadata items.
+- HACS validation currently passes 7 of 9 repository checks. The MIT license and brand-neutral icon pass; only the GitHub repository description and topics remain as non-authentication HACS metadata items.
 - Draft PR #1 remains unmerged.
 - No `0.9.0` tag or GitHub release exists.
 
