@@ -77,3 +77,16 @@ def test_english_translation_covers_both_actions() -> None:
 
 def test_custom_integration_does_not_ship_core_strings_json() -> None:
     assert not (INTEGRATION / "strings.json").exists()
+
+
+def test_mit_license_is_present() -> None:
+    license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+    assert license_text.startswith("MIT License")
+    assert "Permission is hereby granted, free of charge" in license_text
+    assert "Copyright (c) 2026 aevans0001" in license_text
+
+
+def test_release_blocker_is_documented() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "Formal HACS release is currently **blocked**" in readme
+    assert "There is no published `0.9.0` release yet" in readme
