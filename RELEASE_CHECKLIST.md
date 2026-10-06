@@ -26,7 +26,7 @@ not authorize a release.
 - [x] Release-readiness tests
 - [ ] Apply GitHub repository description
 - [ ] Apply GitHub repository topics
-- [ ] Add approved original brand icon
+- [x] Add approved temporary brand icon
 - [ ] HACS validation passes with no failed checks
 
 ## Validation
@@ -36,7 +36,7 @@ not authorize a release.
 - [ ] HACS validation passes
 - [ ] Re-run all checks at final release commit
 - [ ] Review final diff against working `main`
-- [ ] Confirm no unintended dashboard/frontend files are included
+- [x] Confirm no unintended dashboard/frontend files are included
 
 ## Release
 
