@@ -1,6 +1,6 @@
 # Privacy and Confidential-Information Review
 
-Last reviewed: 2026-10-06
+Last reviewed: 2026-10-06 (after temporary branding addition)
 
 Scope: release/hacs-readiness tracked release-preparation files and repository
 metadata prepared for the future Sharp Kitchen 0.9.0 release.
@@ -20,6 +20,11 @@ No release-preparation file introduced:
 Release-preparation commits expose the GitHub account identity through normal
 Git commit metadata; no personal email address was returned by the connected
 GitHub tooling.
+
+A fresh scan of the full PR diff after adding the temporary brand icon found
+no personal email addresses, IP addresses, MAC addresses, local user paths,
+street address, personal name, bearer tokens, or AWS-style access keys in the
+release-preparation changes.
 
 ## Known intentional authentication material in the preserved working code
 
