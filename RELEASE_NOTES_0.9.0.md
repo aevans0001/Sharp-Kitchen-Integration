@@ -39,6 +39,17 @@ preserved implementation while a distribution architecture is investigated.
 No tag, GitHub release, or HACS default-store submission should be created
 until that blocker is resolved and release validation is repeated.
 
+## Release preparation status
+
+- MIT License selected.
+- Offline release-readiness tests pass.
+- Home Assistant hassfest passes.
+- HACS repository validation is still expected to remain blocked until the
+  default branch carries the release metadata/branding and the authentication
+  architecture blocker is resolved.
+- Draft PR #1 remains unmerged.
+- No `0.9.0` tag or GitHub release exists.
+
 ## Disclaimer
 
 Sharp Kitchen Integration is an unofficial community project and is not
