@@ -3,21 +3,30 @@
 Home Assistant 2026.3 and later allows custom integrations to ship branding
 inside `custom_components/sharp_kitchen/brand/`.
 
-## Current temporary icon
+## Current approved icon
 
-The user approved a temporary Sharp Kitchen integration icon and it is now
+The user approved a brand-neutral Sharp Kitchen integration icon and it is now
 present on the release-preparation branch at:
 
 `custom_components/sharp_kitchen/brand/icon.png`
 
-The current icon is a square 256×256 PNG based on original appliance artwork
-created for this integration, with the user-requested Sharp wordmark. It is
-approved as a temporary integration icon and may be replaced before or after a
-future release.
+The current icon is a square 256×256 PNG created specifically for this
+integration. It shows an original stainless-steel microwave drawer viewed
+straight-on with the drawer slightly open, a subtle warm interior glow, a dark
+navy/charcoal rounded-square background, a black control panel, and a small
+digital display.
 
-The image does not copy Sharp product photography. Because the wordmark is a
-Sharp trademark, its use should remain limited to identifying compatibility
-with Sharp Kitchen and should not imply endorsement.
+The icon intentionally contains:
+
+- no manufacturer logo;
+- no Sharp wordmark;
+- no model number;
+- no Wi-Fi symbol;
+- no product photography;
+- no copied corporate artwork.
+
+The design is intended to remain recognizable at small Home Assistant/HACS icon
+sizes while being completely original and brand-neutral.
 
 ## Optional future assets
 
