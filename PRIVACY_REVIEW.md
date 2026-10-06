@@ -42,3 +42,18 @@ modified because doing so would break the preserved working implementation.
 Repeat this review after any future authentication-architecture change and
 before freezing the release commit. No tag, merge, release, or HACS submission
 is authorized by this review.
+
+
+## Current release-preparation diff verification
+
+The current `main...release/hacs-readiness` file list was reviewed after
+branding, license, tests, and documentation updates.
+
+The release-preparation diff does **not** modify the Sharp authentication
+implementation files `api.py`, `const.py`, or `config_flow.py`. The
+working credential values and authentication protocol therefore remain
+unchanged by this preparation work.
+
+A fresh pattern scan of the PR diff found no personal email address, IP address,
+MAC address, local user path, street address, personal name, bearer token, or
+AWS-style access key introduced by the release-preparation changes.
