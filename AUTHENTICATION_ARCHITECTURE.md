@@ -168,6 +168,50 @@ This is not as user-friendly as true vendor provisioning, but it keeps the HACS
 repository free of the extracted private key and avoids a project-operated
 cloud relay.
 
+## Home Assistant architecture implications
+
+Home Assistant's current Application Credentials framework assumes that users
+can obtain an OAuth client ID and client secret from the provider. It supports
+standard authorization-code flows, PKCE, and custom OAuth implementations, but
+it does not provision or store a TLS client certificate/private key as part of
+that framework.
+
+Home Assistant Cloud Account Linking can provide a smoother OAuth experience
+when the provider cooperates with Nabu Casa, but that would require Sharp to
+support/approve an appropriate OAuth/API integration. It is not something this
+project can manufacture from the existing mobile-app credentials.
+
+The Bosch SHC integration remains the strongest architectural comparison:
+during registration it generates a unique SSL certificate/key pair and
+registers that client with the controller. Sharp's published pairing flow does
+not currently expose an equivalent client-registration step.
+
+### Recommended public-safe design if Sharp offers no provisioning API
+
+The best implementable design with the information currently available is:
+
+1. Keep the public HACS repository free of the extracted shared mTLS private key
+   and vendor-app client secret.
+2. Provide a separate, local-only extraction/import helper that contains no
+   Sharp secret material itself and operates on a user's legitimately obtained
+   app installation/package.
+3. Have that helper write the resulting credential bundle locally under a
+   dedicated Home Assistant configuration directory such as
+   `/config/sharp_kitchen/`.
+4. Have the integration validate and consume the local certificate/key files
+   without copying them into `custom_components`.
+5. Use Home Assistant Application Credentials for client ID/secret only if the
+   Sharp hosted-login implementation can be made compatible and users can
+   realistically obtain/provide those values.
+6. Do not use a project-operated proxy unless direct-client approaches are
+   exhausted, because a proxy creates a new privacy/security/availability
+   dependency.
+
+This approach is less convenient than vendor-supported provisioning, but it is
+the cleanest currently viable way to separate secret distribution from the
+public HACS package while preserving direct communication between Home
+Assistant and Sharp.
+
 ## Current recommendation
 
 Do not change the working integration yet.
