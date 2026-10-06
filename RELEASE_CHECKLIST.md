@@ -26,7 +26,7 @@ not authorize a release.
 - [x] Release-readiness tests
 - [ ] Apply GitHub repository description
 - [ ] Apply GitHub repository topics
-- [x] Add approved temporary brand icon
+- [x] Add approved brand-neutral icon
 - [ ] HACS validation passes with no failed checks (currently 7/9; description/topics remain)
 
 ## Validation
@@ -43,7 +43,7 @@ not authorize a release.
 - [ ] Freeze exact release commit
 - [ ] Confirm proposed version
 - [x] Keep draft release notes current (final publication wording still blocked)
-- [ ] Final privacy/confidential-data sweep
+- [x] Final pre-auth privacy/confidential-data sweep
 - [ ] User approves tag/release
 - [ ] Create tag and GitHub release
 - [ ] Verify HACS install from released artifact
