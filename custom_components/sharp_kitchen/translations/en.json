@@ -48,6 +48,24 @@
           "description": "Whether to preheat before cooking."
         }
       }
+    },
+    "start_smart_cook": {
+      "name": "Start Smart Cook",
+      "description": "Run a low-level Sharp Smart Cook command. Normal use should use the Smart Cook entities.",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The numeric device ID from Sharp's backend."
+        },
+        "auto_number": {
+          "name": "Preset Code",
+          "description": "Raw Smart Cook preset identifier from the Sharp app catalog."
+        },
+        "auto_weight": {
+          "name": "App Parameter Value",
+          "description": "Exact app parameter value for the selected Smart Cook preset."
+        }
+      }
     }
   }
 }
