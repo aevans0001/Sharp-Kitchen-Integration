@@ -1,37 +1,59 @@
 # Sharp Kitchen Integration
 
-A Home Assistant custom integration for Sharp Kitchen-connected appliances
-(built and tested against a Sharp SMD2489ES microwave), talking directly
-to Sharp's real cloud API.
+Unofficial Home Assistant custom integration for Sharp Kitchen-connected appliances, built and tested with the Sharp SMD2489ES Microwave Drawer.
 
-## Features
+## Supported and verified behavior
 
-- Real Cognito Hosted-UI OAuth2 login (with automatic token refresh) and
-  mutual TLS client-certificate authentication to Sharp's device API.
-- Manual cook control: cook time (minutes/seconds), power level,
-  Start/Pause/Stop, Open Drawer.
-- Smart Cook presets (built-in automatic cook programs), with a
-  preset selector, weight/quantity slider, and Start button.
-- Device settings exposed as switches: Easy Wave, Sound, Reminder Sound.
-- Sensors: status, door state, time remaining, power, temperature.
+- Sharp Kitchen account sign-in through the same hosted login flow used by the official app.
+- Automatic token refresh and cloud communication.
+- Manual microwave controls: cook time, power level, start, pause, stop, and open drawer.
+- Smart Cook support for the full 29-program SMD2489ES catalog.
+  - Numeric programs expose the applicable quantity/weight control.
+  - Option programs expose the applicable option selector.
+  - Sensor programs use the appliance's sensor-cook behavior.
+- Device settings: Easy Wave, Sound, and Reminder Sound.
+- Sensors for status, drawer/door state, remaining time, power, and temperature.
+
+The currently verified appliance is the Sharp SMD2489ES. Other Sharp Kitchen-connected appliances may use related cloud APIs, but their controls are not claimed as supported until they are specifically verified.
 
 ## Installation
 
-1. Copy the `custom_components/sharp_kitchen` folder into your Home
-   Assistant `config/custom_components/` directory.
+### HACS
+
+HACS packaging is being prepared. Until the first release is published, install this repository as a custom HACS integration only for testing.
+
+1. In HACS, add this repository as a custom repository with category **Integration**.
+2. Install **Sharp Kitchen**.
+3. Restart Home Assistant.
+4. Go to **Settings > Devices & services > Add integration** and search for **Sharp Kitchen**.
+5. Sign in with the same account used by the Sharp Kitchen app.
+
+### Manual
+
+1. Copy `custom_components/sharp_kitchen` into your Home Assistant `config/custom_components/` directory.
 2. Restart Home Assistant.
-3. Go to Settings > Devices & Services > Add Integration, search for
-   "Sharp Kitchen", and log in with your Sharp Kitchen account
-   credentials.
+3. Go to **Settings > Devices & services > Add integration** and search for **Sharp Kitchen**.
 
-## Status
+## Smart Cook
 
-Core cook/control functionality is fully working. Only 3 of Sharp's
-~30 built-in Smart Cook presets are currently mapped (Defrost Ground
-Meat, Beverage Reheat, Hot Water) — more will be added as they're
-captured from the real app.
+The integration contains the 29-program SMD2489ES Smart Cook catalog. The Home Assistant entities adapt to the selected program:
+
+- **Weight/quantity** for numeric programs such as Beverage Reheat.
+- **Option** for programs such as Soften Ice Cream.
+- No secondary value for sensor programs such as Fish / Seafood.
+
+A low-level `sharp_kitchen.start_smart_cook` action remains available for backward compatibility, but normal use should go through the validated entities.
+
+## Notes
+
+- This integration communicates with Sharp's cloud service and therefore requires internet access.
+- The project is reverse engineered from observed behavior of the official Sharp Kitchen app because no public Sharp Kitchen API is known.
+- Appliance writes should be treated like physical appliance controls: verify the selected program/settings before starting a cook cycle.
+
+## Development and validation
+
+Release preparation includes HACS validation and Home Assistant hassfest validation. The repository intentionally contains only the Home Assistant integration; Appliance Control Center/dashboard presentation logic is maintained separately.
 
 ## Disclaimer
 
-This is an unofficial, community-reverse-engineered integration. It is
-not affiliated with or endorsed by Sharp Corporation.
+This project is unofficial and is not affiliated with or endorsed by Sharp Corporation.
