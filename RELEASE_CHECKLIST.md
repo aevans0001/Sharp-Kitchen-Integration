@@ -17,7 +17,7 @@ not authorize a release.
 - [x] One Home Assistant integration under `custom_components/sharp_kitchen`
 - [x] `hacs.json`
 - [x] README
-- [x] MIT LICENSE
+- [x] MIT LICENSE (also applied to default `main` branch)
 - [x] Issue tracker URL in manifest
 - [x] Code owner in manifest
 - [x] Versioned custom integration manifest
@@ -27,7 +27,7 @@ not authorize a release.
 - [ ] Apply GitHub repository description
 - [ ] Apply GitHub repository topics
 - [x] Add approved temporary brand icon
-- [ ] HACS validation passes with no failed checks
+- [ ] HACS validation passes with no failed checks (currently 7/9; description/topics remain)
 
 ## Validation
 
@@ -35,14 +35,14 @@ not authorize a release.
 - [x] hassfest passes after manifest/schema cleanup
 - [ ] HACS validation passes
 - [ ] Re-run all checks at final release commit
-- [ ] Review final diff against working `main`
+- [x] Review current release diff against working code baseline
 - [x] Confirm no unintended dashboard/frontend files are included
 
 ## Release
 
 - [ ] Freeze exact release commit
 - [ ] Confirm proposed version
-- [ ] Finalize release notes
+- [x] Keep draft release notes current (final publication wording still blocked)
 - [ ] Final privacy/confidential-data sweep
 - [ ] User approves tag/release
 - [ ] Create tag and GitHub release
