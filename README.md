@@ -16,11 +16,24 @@ Unofficial Home Assistant custom integration for Sharp Kitchen-connected applian
 
 The currently verified appliance is the Sharp SMD2489ES. Other Sharp Kitchen-connected appliances may use related cloud APIs, but their controls are not claimed as supported until they are specifically verified.
 
+## Release status
+
+Formal HACS release is currently **blocked** while the project investigates a
+public-safe authentication architecture. The working implementation depends on
+Sharp application authentication material, including shared mTLS client-key
+material recovered from the official app. Those working values are being
+preserved while the replacement architecture is researched.
+
+There is no published `0.9.0` release yet, and this repository should be
+treated as development/testing software until that blocker is resolved.
+
 ## Installation
 
 ### HACS
 
-HACS packaging is being prepared. Until the first release is published, install this repository as a custom HACS integration only for testing.
+HACS packaging is being prepared. Until the credential-distribution blocker is
+resolved and a formal release is published, custom-repository installation is
+for development/testing only.
 
 1. In HACS, add this repository as a custom repository with category **Integration**.
 2. Install **Sharp Kitchen**.
@@ -53,6 +66,10 @@ A low-level `sharp_kitchen.start_smart_cook` action remains available for backwa
 ## Development and validation
 
 Release preparation includes HACS validation and Home Assistant hassfest validation. The repository intentionally contains only the Home Assistant integration; Appliance Control Center/dashboard presentation logic is maintained separately.
+
+## License
+
+MIT License. See `LICENSE`.
 
 ## Disclaimer
 
