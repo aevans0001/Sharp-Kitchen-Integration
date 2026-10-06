@@ -45,9 +45,7 @@ until that blocker is resolved and release validation is repeated.
 - MIT License selected.
 - Offline release-readiness tests pass.
 - Home Assistant hassfest passes.
-- HACS repository validation is still expected to remain blocked until the
-  default branch carries the release metadata/branding and the authentication
-  architecture blocker is resolved.
+- HACS validation currently passes 7 of 9 repository checks. The MIT license and brand icon now pass; only the GitHub repository description and topics remain as non-authentication HACS metadata items.
 - Draft PR #1 remains unmerged.
 - No `0.9.0` tag or GitHub release exists.
 
