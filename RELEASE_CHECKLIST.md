@@ -24,16 +24,16 @@ not authorize a release.
 - [x] HACS validation workflow
 - [x] hassfest workflow
 - [x] Release-readiness tests
-- [ ] Apply GitHub repository description
-- [ ] Apply GitHub repository topics
+- [x] Apply GitHub repository description
+- [x] Apply GitHub repository topics
 - [x] Add approved brand-neutral icon
-- [ ] HACS validation passes with no failed checks (currently 7/9; description/topics remain)
+- [x] HACS validation passes with no failed checks
 
 ## Validation
 
 - [x] Offline release-readiness tests pass
 - [x] hassfest passes after manifest/schema cleanup
-- [ ] HACS validation passes
+- [x] HACS validation passes
 - [ ] Re-run all checks at final release commit
 - [x] Review current release diff against working code baseline
 - [x] Confirm no unintended dashboard/frontend files are included
