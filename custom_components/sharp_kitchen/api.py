@@ -81,6 +81,17 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+# Sharp's device/cache endpoint historically accepted only device_id and
+# returned the full normalized state block. In late 2026 the backend started
+# rejecting that legacy form with "epc is None.", requiring an ECHONET
+# Property Code (EPC) selector. These are the standard combination-microwave
+# properties corresponding to the state fields this integration already
+# exposes: door, heating/cook status, chamber temperature, remaining heating
+# time, and microwave heating power.
+_MICROWAVE_STATE_EPCS = (0xB0, 0xB1, 0xE3, 0xE6, 0xE7)
+_EPC_ENCODINGS = ("hex", "decimal", "prefixed_hex", "lower_hex")
+_MISSING_EPC_INFO = "epc is None."
+
 
 def _secret_hash(username: str) -> str:
     """Cognito's required SECRET_HASH: base64(HMAC-SHA256(client secret,
@@ -370,6 +381,10 @@ class SharpKitchenClient:
         self._access_token: str | None = None
         self._cloud_key: str | None = None
         self._access_token_expiry: float = 0.0
+        # None = backend behavior not known yet; True = device/cache now
+        # requires an EPC; False = legacy whole-state read still works.
+        self._cache_requires_epc: bool | None = None
+        self._cache_epc_encoding: str | None = None
 
     @property
     def refresh_token(self) -> str:
@@ -478,12 +493,156 @@ class SharpKitchenClient:
         data = await self._request("GET", PAIRING_PATH)
         return data.get("device_info", [])
 
+    @staticmethod
+    def _is_bad_request_error(err: SharpKitchenApiError) -> bool:
+        """Return True for Sharp's structured HTTP-400 application error."""
+        return isinstance(err.data, dict) and err.data.get("code") == 400
+
+    @classmethod
+    def _is_missing_epc_error(cls, err: SharpKitchenApiError) -> bool:
+        """Detect the backend contract change that now requires an EPC."""
+        return (
+            cls._is_bad_request_error(err)
+            and err.data.get("info") == _MISSING_EPC_INFO
+        )
+
+    @staticmethod
+    def _encode_epc(epc: int, encoding: str) -> str:
+        """Encode an ECHONET Property Code for Sharp's query parameter.
+
+        The private Sharp API has no public contract for this value. Different
+        server/app implementations commonly represent an EPC as two-digit hex,
+        decimal, or 0x-prefixed hex, so the first fallback read probes these
+        harmless GET-only representations and caches the first one Sharp
+        accepts.
+        """
+        if encoding == "hex":
+            return f"{epc:02X}"
+        if encoding == "decimal":
+            return str(epc)
+        if encoding == "prefixed_hex":
+            return f"0x{epc:02X}"
+        if encoding == "lower_hex":
+            return f"{epc:02x}"
+        raise ValueError(f"Unknown EPC encoding: {encoding}")
+
+    @staticmethod
+    def _cache_state_from_data(data: Any) -> dict:
+        """Extract normalized state from either known cache response shape."""
+        if not isinstance(data, dict):
+            return {}
+        state = data.get("state")
+        if isinstance(state, dict):
+            return state
+        # Some property-filtered variants return the property result directly
+        # in data instead of nesting it under "state".
+        return data
+
+    async def _request_cache_epc(self, device_id: int, epc: int) -> Any:
+        """Read one cache property, discovering Sharp's EPC wire format once."""
+        if self._cache_epc_encoding is not None:
+            return await self._request(
+                "GET",
+                DEVICE_CACHE_PATH,
+                params={
+                    "device_id": device_id,
+                    "epc": self._encode_epc(epc, self._cache_epc_encoding),
+                },
+            )
+
+        last_bad_request: SharpKitchenApiError | None = None
+        for encoding in _EPC_ENCODINGS:
+            try:
+                data = await self._request(
+                    "GET",
+                    DEVICE_CACHE_PATH,
+                    params={"device_id": device_id, "epc": self._encode_epc(epc, encoding)},
+                    retry=False,
+                )
+            except SharpKitchenApiError as err:
+                if not self._is_bad_request_error(err):
+                    raise
+                last_bad_request = err
+                continue
+
+            self._cache_epc_encoding = encoding
+            _LOGGER.debug("Sharp Kitchen device/cache EPC encoding is %s", encoding)
+            return data
+
+        if last_bad_request is not None:
+            raise last_bad_request
+        raise SharpKitchenError("Sharp Kitchen device/cache rejected every EPC encoding")
+
+    async def _async_get_device_state_by_epc(self, device_id: int) -> dict:
+        """Compatibility path for backends that require property-specific reads."""
+        state: dict = {}
+        successful_reads = 0
+        last_error: SharpKitchenApiError | None = None
+
+        for epc in _MICROWAVE_STATE_EPCS:
+            try:
+                data = await self._request_cache_epc(device_id, epc)
+            except SharpKitchenApiError as err:
+                # An appliance may not implement every standard microwave
+                # property. A rejected individual EPC should not make the
+                # entire config entry unavailable if other state is readable.
+                if self._is_bad_request_error(err):
+                    last_error = err
+                    _LOGGER.debug(
+                        "Sharp Kitchen device %s does not provide cache EPC %02X: %s",
+                        device_id,
+                        epc,
+                        err,
+                    )
+                    continue
+                raise
+
+            successful_reads += 1
+            state.update(self._cache_state_from_data(data))
+
+        if successful_reads == 0:
+            if last_error is not None:
+                raise last_error
+            raise SharpKitchenError(
+                f"Sharp Kitchen device {device_id} returned no readable cache EPCs"
+            )
+
+        # The old full-cache response also carried the device settings used by
+        # the integration's switches. Preserve those independently now that
+        # state reads may be property-filtered.
+        try:
+            settings = await self.async_get_device_settings(device_id)
+        except SharpKitchenError as err:
+            _LOGGER.debug(
+                "Sharp Kitchen settings read failed during EPC fallback for device %s: %s",
+                device_id,
+                err,
+            )
+        else:
+            state.update(settings)
+
+        return state
+
     async def async_get_device_state(self, device_id: int) -> dict:
         """Return full/live state for one device (cook status, door, etc.)."""
-        data = await self._request(
-            "GET", DEVICE_CACHE_PATH, params={"device_id": device_id}
-        )
-        return data.get("state", {})
+        if self._cache_requires_epc is True:
+            return await self._async_get_device_state_by_epc(device_id)
+
+        try:
+            data = await self._request(
+                "GET", DEVICE_CACHE_PATH, params={"device_id": device_id}
+            )
+        except SharpKitchenApiError as err:
+            if not self._is_missing_epc_error(err):
+                raise
+            self._cache_requires_epc = True
+            _LOGGER.info(
+                "Sharp Kitchen device/cache now requires EPC; using property-specific reads"
+            )
+            return await self._async_get_device_state_by_epc(device_id)
+
+        self._cache_requires_epc = False
+        return self._cache_state_from_data(data)
 
     async def async_get_device_settings(self, device_id: int) -> dict:
         """Return just the basic settings block for one device."""
